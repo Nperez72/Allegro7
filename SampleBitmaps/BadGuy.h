@@ -16,6 +16,8 @@ public:
 	int getY(){return y;}
 	bool getLive() {return live;}
 	void setLive(bool l){live=l;}
+	// Helper mmethod setting new position after collision
+	void setPosition(int newX, int newY);
 private:
 	int x;
 	int y;

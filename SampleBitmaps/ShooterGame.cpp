@@ -5,9 +5,22 @@
 #include "BadGuy.h"
 #include "weapon.h"
 
+enum MoveDir {
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_LEFT,
+	MOVE_RIGHT
+};
+
 
 // Take care of the collision between the player and bad guy
-bool CheckCollision(player& p, BadGuy& b);
+bool check_player_collide(player& p, BadGuy& b);
+// Take care of the collision between bad guys
+bool check_badguy_collide(BadGuy& p, BadGuy& b);
+// Game loop should be kept clean so all repetitive move/collide logic should be handled in a function
+// Move the player in the specified direction, checking for collisons with bad guys
+void MovePlayer(player& myPlayer, BadGuy* BadGuys, int numBadGuys, MoveDir dir, int WIDTH, int HEIGHT);
+
 
 
 int main(void)
@@ -69,14 +82,15 @@ int main(void)
 		if(ev.type == ALLEGRO_EVENT_TIMER)
 		{
 			redraw = true;
+			// Handle player movement and collisions within function calls
 			if(keys[UP])
-				myPlayer.MoveUp();
+				MovePlayer(myPlayer, BadGuys, NUM_BadGuyS, MOVE_UP, WIDTH, HEIGHT);
 			if(keys[DOWN])
-				myPlayer.MoveDown(HEIGHT);
+				MovePlayer(myPlayer, BadGuys, NUM_BadGuyS, MOVE_DOWN, WIDTH, HEIGHT);
 			if(keys[LEFT])
-				myPlayer.MoveLeft();
+				MovePlayer(myPlayer, BadGuys, NUM_BadGuyS, MOVE_LEFT, WIDTH, HEIGHT);
 			if(keys[RIGHT])
-				myPlayer.MoveRight(WIDTH);
+				MovePlayer(myPlayer, BadGuys, NUM_BadGuyS, MOVE_RIGHT, WIDTH, HEIGHT);
 
 			for(int i=0;i<NUM_weapons;i++)
 				weapons[i].Updateweapon(WIDTH);
@@ -163,7 +177,7 @@ int main(void)
 }
 
 
-bool CheckCollision(player& p, BadGuy& b)
+bool check_player_collide(player& p, BadGuy& b)
 {
 	// Check if the player and bad guy rectangles overlap
 	// Returns true if overlap happens, false if not
@@ -172,6 +186,49 @@ bool CheckCollision(player& p, BadGuy& b)
 		p.getY() + p.getBoundY() < b.getY() ||
 		p.getY() > b.getY() + b.getBoundY());
 }
+
+void MovePlayer(player& myPlayer, BadGuy* BadGuys, int numBadGuys, MoveDir dir, int WIDTH, int HEIGHT) {
+
+	// Store the player's old position to reset if a collision occurs
+	int oldX = myPlayer.getX();
+	int oldY = myPlayer.getY();
+
+	// Use enum to determine movement direction
+	switch (dir) {
+		case MOVE_UP:   
+			myPlayer.MoveUp(); 
+			break;
+		case MOVE_DOWN:  
+			myPlayer.MoveDown(HEIGHT); 
+			break;
+		case MOVE_LEFT:  
+			myPlayer.MoveLeft(); 
+			break;
+		case MOVE_RIGHT: 
+			myPlayer.MoveRight(WIDTH); 
+			break;
+	}
+
+	// Check for collisions with bad guys after moving
+	for (int i = 0; i < numBadGuys; ++i) {
+		if (BadGuys[i].getLive() && check_player_collide(myPlayer, BadGuys[i])) {
+			myPlayer.setPosition(oldX, oldY); // Reset position if collision occurs
+			break;
+		}
+	}
+
+}
+
+bool check_badguy_collide(BadGuy& b1, BadGuy& b2)
+{
+	// Check if the bad guy rectangles overlap
+	// Returns true if overlap happens, false if not
+	return !(b1.getX() + b1.getBoundX() < b2.getX() ||
+		b1.getX() > b2.getX() + b2.getBoundX() ||
+		b1.getY() + b1.getBoundY() < b2.getY() ||
+		b1.getY() > b2.getY() + b2.getBoundY());
+}
+
 
 
 

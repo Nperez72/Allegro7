@@ -17,6 +17,8 @@ public:
 	int getBoundY(){return boundy;}
 	int getX(){return x;}
 	int getY(){return y;}
+	// Helper mmethod setting new position after collision
+	void setPosition(int newX, int newY);
 private:
 	int x;
 	int y;

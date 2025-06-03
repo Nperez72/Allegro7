@@ -64,3 +64,8 @@ void player::MoveRight(int WIDTH)
 	if(x > WIDTH-boundx)
 		x = WIDTH-boundx;
 }
+
+void player::setPosition(int newX, int newY) {
+	x = newX;
+	y = newY;
+}

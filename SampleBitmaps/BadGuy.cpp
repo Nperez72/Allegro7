@@ -26,6 +26,12 @@ BadGuy::BadGuy()
 	live = false;
 
 }
+
+void BadGuy::setPosition(int newX, int newY) {
+	x = newX;
+	y = newY;
+}
+
 void BadGuy::DrawBadGuy()
 {
 
