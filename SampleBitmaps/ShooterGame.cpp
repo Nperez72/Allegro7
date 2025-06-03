@@ -6,7 +6,8 @@
 #include "weapon.h"
 
 
-
+// Take care of the collision between the player and bad guy
+bool CheckCollision(player& p, BadGuy& b);
 
 
 int main(void)
@@ -83,7 +84,6 @@ int main(void)
 				BadGuys[i].StartBadGuy(WIDTH,HEIGHT);
 			for(int i=0;i<NUM_weapons;i++)
 				weapons[i].Collideweapon(BadGuys, NUM_BadGuyS);
-
 		}
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
@@ -163,6 +163,15 @@ int main(void)
 }
 
 
+bool CheckCollision(player& p, BadGuy& b)
+{
+	// Check if the player and bad guy rectangles overlap
+	// Returns true if overlap happens, false if not
+	return !(p.getX() + p.getBoundX() < b.getX() ||
+		p.getX() > b.getX() + b.getBoundX() ||
+		p.getY() + p.getBoundY() < b.getY() ||
+		p.getY() > b.getY() + b.getBoundY());
+}
 
 
 
