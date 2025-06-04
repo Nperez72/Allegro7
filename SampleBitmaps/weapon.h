@@ -14,6 +14,9 @@ public:
 private:
 	int x;
 	int y;
+	// The velocity of the weapon projectile
+	int vx;
+	int vy;
 	int boundx;
 	int boundy;
 	bool live;

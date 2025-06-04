@@ -38,31 +38,49 @@ player::player(int HEIGHT)
 }
 void player::DrawPlayer()
 {
-	al_draw_bitmap(image, x,y, 0);
+    al_draw_bitmap(image, x, y, 0);
+
+    // Draw a red marker on the edge based on lastDir
+    ALLEGRO_COLOR red = al_map_rgb(255, 100, 100);
+    int thickness = 3;
+    switch(lastDir) {
+        case 0: // Up
+            al_draw_filled_rectangle(x, y, x+boundx, y+thickness, red);
+            break;
+        case 1: // Down
+            al_draw_filled_rectangle(x, y+boundy-thickness, x+boundx, y+boundy, red);
+            break;
+        case 2: // Left
+            al_draw_filled_rectangle(x, y, x+thickness, y+boundy, red);
+            break;
+        case 3: // Right
+            al_draw_filled_rectangle(x+boundx-thickness, y, x+boundx, y+boundy, red);
+            break;
+    }
 }
 void player::MoveUp()
 {
 	y -= speed;
-	if(y < 0)
-		y = 0;
+	if(y < 0) y = 0;
+    lastDir = 0;
 }
 void player::MoveDown(int HEIGHT)
 {
 	y += speed;
-	if(y > HEIGHT-boundy)
-		y = HEIGHT-boundy;
+	if(y > HEIGHT-boundy) y = HEIGHT-boundy;
+    lastDir = 1;
 }
 void player::MoveLeft()
 {
 	x -= speed;
-	if(x < 0)
-		x = 0;
+	if(x < 0) x = 0;
+    lastDir = 2;
 }
 void player::MoveRight(int WIDTH)
 {
 	x += speed;
-	if(x > WIDTH-boundx)
-		x = WIDTH-boundx;
+	if(x > WIDTH-boundx) x = WIDTH-boundx;
+    lastDir = 3;
 }
 
 void player::setPosition(int newX, int newY) {

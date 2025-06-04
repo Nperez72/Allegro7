@@ -12,7 +12,6 @@ enum MoveDir {
 	MOVE_RIGHT
 };
 
-
 // Take care of the collision between the player and bad guy
 bool check_player_collide(player& p, BadGuy& b);
 // Take care of the collision between bad guys
@@ -21,12 +20,8 @@ bool check_badguy_collide(BadGuy& p, BadGuy& b);
 // Move the player in the specified direction, checking for collisons with bad guys
 void MovePlayer(player& myPlayer, BadGuy* BadGuys, int numBadGuys, MoveDir dir, int WIDTH, int HEIGHT);
 
-
-
 int main(void)
 {
-
-
 	const int WIDTH = 800;
 	const int HEIGHT = 400;
 	const int NUM_weapons = 5;
@@ -38,7 +33,6 @@ int main(void)
 	bool done = false;
 	bool redraw = true;
 	const int FPS = 60;
-
 
 	//Allegro variables
 	ALLEGRO_DISPLAY *display = NULL;
@@ -63,7 +57,6 @@ int main(void)
 	weapon weapons[NUM_weapons];
 	BadGuy BadGuys[NUM_BadGuyS];
 
-
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / FPS);
 
@@ -74,6 +67,7 @@ int main(void)
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_set_target_bitmap(al_get_backbuffer(display));
 	al_start_timer(timer);
+
 	while(!done)
 	{
 		ALLEGRO_EVENT ev;
@@ -94,8 +88,35 @@ int main(void)
 
 			for(int i=0;i<NUM_weapons;i++)
 				weapons[i].Updateweapon(WIDTH);
-			for(int i=0;i<NUM_BadGuyS;i++)
-				BadGuys[i].StartBadGuy(WIDTH,HEIGHT);
+
+			// Updated respawn for bad guys
+			for(int i= 0;i<NUM_BadGuyS;i++)
+			{
+				if(!BadGuys[i].getLive())
+				{
+					// Only spawn if not colliding with player or any other live BadGuy
+					bool overlap = false;
+
+					// Check overlap with player
+					if(check_player_collide(myPlayer, BadGuys[i])) {
+						overlap = true;
+					}
+
+					// Check overlap with other live BadGuys
+					for(int j = 0; j < NUM_BadGuyS; j++) {
+						if(i != j && BadGuys[j].getLive() && check_badguy_collide(BadGuys[i], BadGuys[j])) {
+							overlap = true;
+							break;
+						}
+					}
+
+					// Only attempt to spawn if no overlap
+					if(!overlap) {
+						BadGuys[i].StartBadGuy(WIDTH, HEIGHT);
+					}
+				}
+			}
+
 			for(int i=0;i<NUM_weapons;i++)
 				weapons[i].Collideweapon(BadGuys, NUM_BadGuyS);
 		}
@@ -176,7 +197,6 @@ int main(void)
 	return 0;
 }
 
-
 bool check_player_collide(player& p, BadGuy& b)
 {
 	// Check if the player and bad guy rectangles overlap
@@ -228,6 +248,9 @@ bool check_badguy_collide(BadGuy& b1, BadGuy& b2)
 		b1.getY() + b1.getBoundY() < b2.getY() ||
 		b1.getY() > b2.getY() + b2.getBoundY());
 }
+
+
+
 
 
 

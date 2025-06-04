@@ -29,13 +29,15 @@ weapon::weapon()
 	x = 0;
 	y = 0;
 
-
 	speed = 7;
 	boundx = al_get_bitmap_width(image)/2;
 	boundy = al_get_bitmap_height(image)/2;
 	live=false;
 	angle=0;
 
+	// Initialize velocity
+	vx = 0;
+	vy = 0;
 }
 void weapon::Drawweapon()
 {
@@ -45,12 +47,37 @@ void weapon::Drawweapon()
 		angle+=.1;
 	}
 }
-void weapon::Fireweapon( player &Player)
+void weapon::Fireweapon(player &Player)
 {
 	if(!live)
 	{
-		x = Player.getX() + Player.getBoundX();
+		// Center the projectile on the player
+		x = Player.getX() + Player.getBoundX()/2;
 		y = Player.getY() + Player.getBoundY()/2;
+
+		// Set velocity based on player's last direction
+		switch(Player.getLastDir()) {
+			case 0: // Up
+				vx = 0;
+				vy = -speed;
+				break;
+			case 1: // Down
+				vx = 0;
+				vy = speed;
+				break;
+			case 2: // Left
+				vx = -speed;
+				vy = 0;
+				break;
+			case 3: // Right
+				vx = speed;
+				vy = 0;
+				break;
+			default:
+				vx = speed;
+				vy = 0;
+				break;
+		}
 		live = true;
 	}
 }
@@ -58,8 +85,10 @@ void weapon::Updateweapon(int WIDTH)
 {
 	if(live)
 	{
-		x += speed;
-		if(x > WIDTH)
+		x += vx;
+		y += vy;
+		// Out of bounds check for fired projectile
+		if(x < 0 || x > WIDTH || y < 0)
 			live = false;
 	}
 }
